@@ -75,6 +75,7 @@ const Tabs = ({isTradeModalVisible, setTradeModalVisibility}) => {
         if (isTrade) {
           return (
             <Tab.Screen
+              key={name}
               name={name}
               component={component}
               options={{
@@ -101,6 +102,7 @@ const Tabs = ({isTradeModalVisible, setTradeModalVisibility}) => {
         } else {
           return (
             <Tab.Screen
+              key={name}
               name={name}
               component={component}
               options={{
