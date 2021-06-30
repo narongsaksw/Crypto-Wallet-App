@@ -12,8 +12,10 @@ import {SIZES, COLORS, FONTS, dummyData, icons} from '../constants';
 const Home = ({getHoldings, getCoinMarket, myHoldings, coins}) => {
   useFocusEffect(
     useCallback(() => {
+      // eslint-disable-next-line no-undef
       getHoldings((holdings = dummyData.holdings));
       getCoinMarket();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []),
   );
 

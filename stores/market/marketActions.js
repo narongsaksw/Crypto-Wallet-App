@@ -120,7 +120,7 @@ export const getCoinMarket = (
       },
     })
       .then(response => {
-        console.log('get Market: ', response);
+        // console.log('get Market: ', response);
         if (response.status === 200) {
           dispatch(getCoinMarketSucccess(response.data));
         } else {

@@ -15,7 +15,7 @@ import {SIZES, COLORS, FONTS} from '../constants';
 const Chart = ({containerStyle, chartPrices}) => {
   let startUnixTimestamp = dayjs().subtract(7, 'day').unix();
   let data = chartPrices
-    ? chartPrices.map((item, index) => {
+    ? chartPrices?.map((item, index) => {
         return {
           x: startUnixTimestamp + (index + 1) * 3600,
           y: item,
@@ -136,27 +136,26 @@ const Chart = ({containerStyle, chartPrices}) => {
                     backgroundColor: COLORS.lightGreen,
                   }}
                 />
+                {/* Y-Label */}
+                <ChartYLabel
+                  format={formatUSD}
+                  style={{
+                    color: COLORS.white,
+                    ...FONTS.body5,
+                  }}
+                />
+
+                {/* X-Label */}
+                <ChartXLabel
+                  format={formatDateTime}
+                  style={{
+                    marginTop: 3,
+                    color: COLORS.lightGray3,
+                    ...FONTS.body5,
+                    lineHeight: 15,
+                  }}
+                />
               </View>
-
-              {/* Y-Label */}
-              <ChartYLabel
-                format={formatUSD}
-                style={{
-                  color: COLORS.white,
-                  ...FONTS.body5,
-                }}
-              />
-
-              {/* X-Label */}
-              <ChartXLabel
-                format={formatDateTime}
-                style={{
-                  marginTop: 3,
-                  color: COLORS.lightGray3,
-                  ...FONTS.body5,
-                  lineHeight: 15,
-                }}
-              />
             </View>
           </ChartDot>
         </ChartPathProvider>
