@@ -22,6 +22,7 @@ const MainLayout = ({children, isTradeModalVisible}) => {
         useNativeDriver: false,
       }).start();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isTradeModalVisible]);
 
   const modalY = modalAnimatedValue.interpolate({
@@ -34,11 +35,11 @@ const MainLayout = ({children, isTradeModalVisible}) => {
       {/* Dim Background */}
       <Animated.View
         style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
+          // position: 'absolute',
+          // top: 0,
+          // left: 0,
+          // right: 0,
+          // bottom: 0,
           backgroundColor: COLORS.transparentBlack,
         }}
         opacity={modalAnimatedValue}

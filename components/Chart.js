@@ -136,26 +136,26 @@ const Chart = ({containerStyle, chartPrices}) => {
                     backgroundColor: COLORS.lightGreen,
                   }}
                 />
-                {/* Y-Label */}
-                <ChartYLabel
-                  format={formatUSD}
-                  style={{
-                    color: COLORS.white,
-                    ...FONTS.body5,
-                  }}
-                />
-
-                {/* X-Label */}
-                <ChartXLabel
-                  format={formatDateTime}
-                  style={{
-                    marginTop: 3,
-                    color: COLORS.lightGray3,
-                    ...FONTS.body5,
-                    lineHeight: 15,
-                  }}
-                />
               </View>
+              {/* Y-Label */}
+              <ChartYLabel
+                format={formatUSD}
+                style={{
+                  color: COLORS.white,
+                  ...FONTS.body5,
+                }}
+              />
+
+              {/* X-Label */}
+              <ChartXLabel
+                format={formatDateTime}
+                style={{
+                  marginTop: 3,
+                  color: COLORS.lightGray3,
+                  ...FONTS.body5,
+                  lineHeight: 15,
+                }}
+              />
             </View>
           </ChartDot>
         </ChartPathProvider>
