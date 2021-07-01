@@ -1,15 +1,18 @@
-import React, {useCallback} from 'react';
+import React, {useCallback, useState} from 'react';
 import {View, Text, FlatList, TouchableOpacity, Image} from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
 
 import {connect} from 'react-redux';
-import {getHoldings, getCoinMarket} from '../stores/market/marketActions';
+import {getHoldings, getCoinMarket} from '../../stores/market/marketActions';
 
-import {BalanceInfo, IconTextButton, Chart} from '../components';
-import {MainLayout} from './';
-import {SIZES, COLORS, FONTS, dummyData, icons} from '../constants';
+import {BalanceInfo, IconTextButton, Chart} from '../../components';
+import {MainLayout} from '..';
+import {SIZES, COLORS, FONTS, dummyData, icons} from '../../constants';
+import styles from './style';
 
 const Home = ({getHoldings, getCoinMarket, myHoldings, coins}) => {
+  const [selectedCoin, setSelectedCoin] = useState(null);
+
   useFocusEffect(
     useCallback(() => {
       // eslint-disable-next-line no-undef
@@ -28,32 +31,19 @@ const Home = ({getHoldings, getCoinMarket, myHoldings, coins}) => {
 
   const renderWalletInfoSection = () => {
     return (
-      <View
-        style={{
-          paddingHorizontal: SIZES.padding,
-          borderBottomRightRadius: 25,
-          borderBottomLeftRadius: 25,
-          backgroundColor: COLORS.gray,
-        }}>
+      <View style={styles.infoContainer}>
         <BalanceInfo
           title="Your Wallet"
           displayAmount={totalWallet}
           changePct={percChange}
           containerStyle={{marginTop: 50}}
         />
-        <View
-          style={{
-            flexDirection: 'row',
-            marginTop: 30,
-            marginBottom: -15,
-            paddingHorizontal: SIZES.radius,
-          }}>
+        <View style={styles.infoIconButtonContainer}>
           <IconTextButton
             label="Transfer"
             icon={icons.send}
             containerStyle={{
-              flex: 1,
-              height: 40,
+              ...styles.infoIconButtonTextContainer,
               marginRight: SIZES.radius,
             }}
             onPress={() => console.log('Transfer')}
@@ -61,10 +51,7 @@ const Home = ({getHoldings, getCoinMarket, myHoldings, coins}) => {
           <IconTextButton
             label="Withdraw"
             icon={icons.withdraw}
-            containerStyle={{
-              flex: 1,
-              height: 40,
-            }}
+            containerStyle={styles.infoIconButtonTextContainer}
             onPress={() => console.log('Transfer')}
           />
         </View>
@@ -74,11 +61,7 @@ const Home = ({getHoldings, getCoinMarket, myHoldings, coins}) => {
 
   return (
     <MainLayout>
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: COLORS.black,
-        }}>
+      <View style={styles.container}>
         {/* Header Wallet Info */}
         {renderWalletInfoSection()}
 
@@ -87,27 +70,21 @@ const Home = ({getHoldings, getCoinMarket, myHoldings, coins}) => {
           containerStyle={{
             marginTop: SIZES.padding * 2,
           }}
-          chartPrices={coins[0]?.sparkline_in_7d?.price}
+          chartPrices={
+            selectedCoin
+              ? selectedCoin?.sparkline_in_7d?.price
+              : coins[0]?.sparkline_in_7d?.price
+          }
         />
 
         {/* Top Cryptocurrencies */}
         <FlatList
           data={coins}
           keyExtractor={item => item.id}
-          contentContainerStyle={{
-            marginTop: 30,
-            paddingHorizontal: SIZES.padding,
-          }}
+          contentContainerStyle={styles.contentContainerStyle}
           ListHeaderComponent={
             <View style={{marginBottom: SIZES.radius}}>
-              <Text
-                style={{
-                  color: COLORS.white,
-                  ...FONTS.h3,
-                  fontSize: 18,
-                }}>
-                Top Cryptocurrencies
-              </Text>
+              <Text style={styles.headerText}>Top Cryptocurrencies</Text>
             </View>
           }
           renderItem={({item}) => {
@@ -119,12 +96,8 @@ const Home = ({getHoldings, getCoinMarket, myHoldings, coins}) => {
                 : COLORS.red;
             return (
               <TouchableOpacity
-                style={{
-                  height: 55,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}>
+                style={styles.itemContainer}
+                onPress={() => setSelectedCoin(item)}>
                 {/* Logo  */}
                 <View style={{width: 35}}>
                   <Image
@@ -133,10 +106,7 @@ const Home = ({getHoldings, getCoinMarket, myHoldings, coins}) => {
                   />
                 </View>
                 {/* Name */}
-                <View
-                  style={{
-                    flex: 1,
-                  }}>
+                <View style={{flex: 1}}>
                   <Text style={{color: COLORS.white, ...FONTS.h3}}>
                     {item.name}
                   </Text>
@@ -144,20 +114,10 @@ const Home = ({getHoldings, getCoinMarket, myHoldings, coins}) => {
 
                 {/* Figures */}
                 <View>
-                  <Text
-                    style={{
-                      textAlign: 'right',
-                      color: COLORS.white,
-                      ...FONTS.h4,
-                    }}>
+                  <Text style={styles.currentPriceText}>
                     $ {item.current_price}
                   </Text>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'flex-end',
-                    }}>
+                  <View style={styles.percentageWrapper}>
                     {item.price_change_percentage_7d_in_currency != 0 && (
                       <Image
                         source={icons.upArrow}
@@ -172,13 +132,7 @@ const Home = ({getHoldings, getCoinMarket, myHoldings, coins}) => {
                         }}
                       />
                     )}
-                    <Text
-                      style={{
-                        marginLeft: 5,
-                        color: priceColor,
-                        ...FONTS.body5,
-                        lineHeight: 15,
-                      }}>
+                    <Text style={{...styles.percentageText, color: priceColor}}>
                       {item.price_change_percentage_7d_in_currency.toFixed(2)}%
                     </Text>
                   </View>
