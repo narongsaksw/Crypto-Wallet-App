@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import {useFocusEffect} from '@react-navigation/native';
 import {getHoldings} from '../../stores/market/marketActions';
 
-import {MainLayout} from '..';
+import {MainLayout} from '../../Layout';
 import {BalanceInfo, Chart} from '../../components';
 import {SIZES, FONTS, COLORS, dummyData, icons} from '../../constants';
 import styles from './style';

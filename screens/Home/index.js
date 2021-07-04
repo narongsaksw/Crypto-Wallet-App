@@ -6,7 +6,7 @@ import {connect} from 'react-redux';
 import {getHoldings, getCoinMarket} from '../../stores/market/marketActions';
 
 import {BalanceInfo, IconTextButton, Chart} from '../../components';
-import {MainLayout} from '..';
+import {MainLayout} from '../../Layout';
 import {SIZES, COLORS, FONTS, dummyData, icons} from '../../constants';
 import styles from './style';
 

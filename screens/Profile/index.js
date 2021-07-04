@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {View, Text, ScrollView, Image, StyleSheet} from 'react-native';
 
-import {MainLayout} from '..';
+import {MainLayout} from '../../Layout';
 import {HeaderBar} from '../../components';
 import Setting from './setting';
 import SectionTitle from './sectionTitle';

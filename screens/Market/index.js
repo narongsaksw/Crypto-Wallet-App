@@ -1,111 +1,21 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Animated,
-  Image,
-  FlatList,
-} from 'react-native';
+import React, {useCallback, useEffect, useRef} from 'react';
+import {View, Text, Animated, Image, FlatList} from 'react-native';
 import {LineChart} from 'react-native-chart-kit';
 
 import {connect} from 'react-redux';
 import {getCoinMarket} from '../../stores/market/marketActions';
 
 import {HeaderBar, TextButton} from '../../components';
+import Tabs from './tab';
 
-import {MainLayout} from '..';
+import {MainLayout} from '../../Layout';
 import {COLORS, constants, FONTS, icons, SIZES} from '../../constants';
+import styles from './style';
 
 const marketTabs = constants.marketTabs.map(marketTab => ({
   ...marketTab,
   ref: React.createRef(),
 }));
-
-const TabIndicator = ({measureLayout, scrollX}) => {
-  const inputRange = marketTabs.map((_, i) => i * SIZES.width);
-  const translateX = scrollX.interpolate({
-    inputRange,
-    outputRange: measureLayout.map(measure => measure.x),
-  });
-  return (
-    <Animated.View
-      style={{
-        position: 'absolute',
-        left: 0,
-        height: '100%',
-        width: (SIZES.width - SIZES.radius * 2) / 2,
-        borderRadius: SIZES.radius,
-        backgroundColor: COLORS.lightGray,
-        transform: [
-          {
-            translateX,
-          },
-        ],
-      }}
-    />
-  );
-};
-
-const Tabs = ({scrollX, onMarketTabPress}) => {
-  const [measureLayout, setMeasureLayout] = useState([]);
-  const containerRef = useRef();
-
-  useEffect(() => {
-    let ml = [];
-    marketTabs.forEach(marketTab => {
-      marketTab?.ref?.current?.measureLayout(
-        containerRef.current,
-        (x, y, width, height) => {
-          ml.push({
-            x,
-            y,
-            width,
-            height,
-          });
-
-          if (ml.length === marketTabs.length) {
-            setMeasureLayout(ml);
-          }
-        },
-      );
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [containerRef.current]);
-  return (
-    <View
-      ref={containerRef}
-      style={{
-        flexDirection: 'row',
-      }}>
-      {/* Tab Indicator */}
-      {measureLayout.length > 0 && (
-        <TabIndicator measureLayout={measureLayout} scrollX={scrollX} />
-      )}
-      {marketTabs.map((item, index) => {
-        return (
-          <TouchableOpacity
-            key={`MarketTab-${index}`}
-            style={{flex: 1}}
-            onPress={() => onMarketTabPress(index)}>
-            <View
-              ref={item.ref}
-              style={{
-                paddingHorizontal: 15,
-                alignItems: 'center',
-                justifyContent: 'center',
-                height: 40,
-              }}>
-              <Text style={{color: COLORS.white, ...FONTS.h3}}>
-                {item.title}
-              </Text>
-            </View>
-          </TouchableOpacity>
-        );
-      })}
-    </View>
-  );
-};
 
 const Market = ({getCoinMarket, coins}) => {
   const scrollX = useRef(new Animated.Value(0)).current;
@@ -124,26 +34,19 @@ const Market = ({getCoinMarket, coins}) => {
 
   const renderTabBar = () => {
     return (
-      <View
-        style={{
-          marginTop: SIZES.radius,
-          marginHorizontal: SIZES.radius,
-          borderRadius: SIZES.radius,
-          backgroundColor: COLORS.gray,
-        }}>
-        <Tabs scrollX={scrollX} onMarketTabPress={onMarketTabPress} />
+      <View style={styles.containerTabBar}>
+        <Tabs
+          scrollX={scrollX}
+          onMarketTabPress={onMarketTabPress}
+          marketTabs={marketTabs}
+        />
       </View>
     );
   };
 
   const renderButtons = () => {
     return (
-      <View
-        style={{
-          flexDirection: 'row',
-          marginTop: SIZES.radius,
-          marginHorizontal: SIZES.radius,
-        }}>
+      <View style={styles.containerButtons}>
         <TextButton label="USD" />
         <TextButton label="% (7d)" containerStyle={{marginLeft: SIZES.base}} />
         <TextButton label="Top" containerStyle={{marginLeft: SIZES.base}} />
@@ -152,6 +55,12 @@ const Market = ({getCoinMarket, coins}) => {
   };
 
   const renderList = () => {
+    const onScroll = Animated.event(
+      [{nativeEvent: {contentOffset: {x: scrollX}}}],
+      {
+        useNativeDriver: false,
+      },
+    );
     return (
       <Animated.FlatList
         ref={marketTabScrollViewRef}
@@ -165,19 +74,10 @@ const Market = ({getCoinMarket, coins}) => {
         snapToAlignment="center"
         showsHorizontalScrollIndicator={false}
         keyExtractor={item => item.id}
-        onScroll={Animated.event(
-          [{nativeEvent: {contentOffset: {x: scrollX}}}],
-          {
-            useNativeDriver: false,
-          },
-        )}
+        onScroll={onScroll}
         renderItem={({item, index}) => {
           return (
-            <View
-              style={{
-                flex: 1,
-                width: SIZES.width,
-              }}>
+            <View style={styles.containerList}>
               <FlatList
                 data={coins}
                 keyExtractor={item => item.id}
@@ -188,20 +88,17 @@ const Market = ({getCoinMarket, coins}) => {
                       : item.price_change_percentage_7d_in_currency > 0
                       ? COLORS.lightGreen
                       : COLORS.red;
+                  let data = {
+                    datasets: [
+                      {
+                        data: item.sparkline_in_7d.price,
+                      },
+                    ],
+                  };
                   return (
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        paddingHorizontal: SIZES.padding,
-                        marginBottom: SIZES.radius,
-                      }}>
+                    <View style={styles.containerItemList}>
                       {/* Coins */}
-                      <View
-                        style={{
-                          flex: 1.5,
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                        }}>
+                      <View style={styles.wrapCoin}>
                         <Image
                           source={{uri: item.image}}
                           style={{
@@ -210,21 +107,11 @@ const Market = ({getCoinMarket, coins}) => {
                           }}
                         />
 
-                        <Text
-                          style={{
-                            marginLeft: SIZES.radius,
-                            color: COLORS.white,
-                            ...FONTS.h3,
-                          }}>
-                          {item.name}
-                        </Text>
+                        <Text style={styles.coinNameText}>{item.name}</Text>
                       </View>
+
                       {/* Line Chart */}
-                      <View
-                        style={{
-                          flex: 1,
-                          alignItems: 'center',
-                        }}>
+                      <View style={styles.wrapLineChart}>
                         <LineChart
                           withVerticalLabels={false}
                           withHorizontalLabels={false}
@@ -232,13 +119,7 @@ const Market = ({getCoinMarket, coins}) => {
                           withInnerLines={false}
                           withVerticalLines={false}
                           withOuterLines={false}
-                          data={{
-                            datasets: [
-                              {
-                                data: item.sparkline_in_7d.price,
-                              },
-                            ],
-                          }}
+                          data={data}
                           width={100}
                           height={60}
                           chartConfig={{
@@ -250,27 +131,14 @@ const Market = ({getCoinMarket, coins}) => {
                           }}
                         />
                       </View>
+
                       {/* figures */}
-                      <View
-                        style={{
-                          flex: 1,
-                          alignItems: 'flex-end',
-                          justifyContent: 'center',
-                        }}>
-                        <Text
-                          style={{
-                            color: COLORS.white,
-                            ...FONTS.h4,
-                          }}>
+                      <View style={styles.wrapFigures}>
+                        <Text style={styles.currentPrice}>
                           $ {item.current_price}
                         </Text>
 
-                        <View
-                          style={{
-                            flexDirection: 'row',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                          }}>
+                        <View style={styles.wrapPriceChangePercentage7d}>
                           {item.price_change_percentage_7d_in_currency != 0 && (
                             <Image
                               source={icons.upArrow}
@@ -311,11 +179,7 @@ const Market = ({getCoinMarket, coins}) => {
   };
   return (
     <MainLayout>
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: COLORS.black,
-        }}>
+      <View style={styles.container}>
         {/* Header */}
         <HeaderBar title="Market" />
         {/* Tab Bar */}
